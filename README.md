@@ -38,12 +38,7 @@ cd ../client
 npm install
 ```
 
-## Environment Variables
 
-```env
-DATABASE_URL=your_database_url
-JWT_SECRET=your_secret
-```
 
 ## Architecture
 

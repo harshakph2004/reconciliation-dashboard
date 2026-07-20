@@ -12,30 +12,30 @@ function App() {
       {/* Default Route */}
       <Route
         path="/"
-        element={token ? <Navigate to="/dashboard" /> : <Navigate to="/login" />}
+        element={<Navigate to={token ? "/dashboard" : "/login"} replace />}
       />
 
       {/* Public Routes */}
       <Route
         path="/login"
-        element={token ? <Navigate to="/dashboard" /> : <Login />}
+        element={token ? <Navigate to="/dashboard" replace /> : <Login />}
       />
 
       <Route
         path="/signup"
-        element={token ? <Navigate to="/dashboard" /> : <Signup />}
+        element={token ? <Navigate to="/dashboard" replace /> : <Signup />}
       />
 
       {/* Protected Route */}
       <Route
         path="/dashboard"
-        element={token ? <Dashboard /> : <Navigate to="/login" />}
+        element={token ? <Dashboard /> : <Navigate to="/login" replace />}
       />
 
-      {/* Any unknown URL */}
+      {/* Unknown Routes */}
       <Route
         path="*"
-        element={<Navigate to={token ? "/dashboard" : "/login"} />}
+        element={<Navigate to={token ? "/dashboard" : "/login"} replace />}
       />
     </Routes>
   );

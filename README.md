@@ -1,7 +1,7 @@
 # Reconciliation Dashboard
 
 ## Live Demo
-Frontend: https://reconciliation-dashboard-two.vercel.app/login
+Frontend: https://reconciliation-dashboard-two.vercel.app/
 
 Backend: https://reconciliation-dashboard.onrender.com
 

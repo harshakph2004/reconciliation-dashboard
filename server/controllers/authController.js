@@ -24,6 +24,11 @@ export const signup = async (req, res) => {
       },
     });
 
+    // Clear old uploaded data for a fresh start
+    await prisma.reconciliationResult.deleteMany({});
+    await prisma.payment.deleteMany({});
+    await prisma.order.deleteMany({});
+
     res.status(201).json({
       message: "Signup successful",
       user,
@@ -56,6 +61,11 @@ export const login = async (req, res) => {
         message: "Invalid password",
       });
     }
+
+    // Clear old uploaded data for a fresh session
+    await prisma.reconciliationResult.deleteMany({});
+    await prisma.payment.deleteMany({});
+    await prisma.order.deleteMany({});
 
     const token = jwt.sign(
       { id: user.id },

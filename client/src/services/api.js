@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const api = axios.create({
+const API = axios.create({
   baseURL: "https://reconciliation-dashboard.onrender.com/api",
 });
 

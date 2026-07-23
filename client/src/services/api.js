@@ -1,7 +1,18 @@
 import axios from "axios";
 
-const API = axios.create({
+const api = axios.create({
   baseURL: "https://reconciliation-dashboard.onrender.com/api",
 });
 
-export default API;
+// Automatically attach JWT token to every request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+export default api;

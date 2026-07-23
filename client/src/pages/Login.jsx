@@ -13,7 +13,7 @@ function Login() {
 
     try {
       const response = await axios.post(
-        "https://reconciliation-dashboard.onrender.com/api/auth/signup",
+        "https://reconciliation-dashboard.onrender.com/api/auth/login",
         {
           email,
           password,

@@ -215,3 +215,4 @@ function ResultsTable() {
   </div>
 );
 }
+export default ResultsTable;

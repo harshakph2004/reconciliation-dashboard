@@ -214,3 +214,4 @@ function ResultsTable() {
     )}
   </div>
 );
+}

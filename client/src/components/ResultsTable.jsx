@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import api from "../services/api";
 
 function ResultsTable() {
@@ -125,35 +125,45 @@ function ResultsTable() {
         <tbody>
           {filteredResults.length > 0 ? (
             filteredResults.map((row) => (
-              <tr key={row.id}>
-                <td>{row.orderId}</td>
-                <td>{row.transactionRef || "-"}</td>
-                <td><span className={`issue-pill ${row.issueType === "Matched" ? "matched" : "open"}`}>{row.issueType}</span></td>
-                <td>${Number(row.orderAmount).toFixed(2)}</td>
-                <td>
-                  {row.paymentAmount == null
-                    ? "-"
-                    : `$${Number(row.paymentAmount).toFixed(2)}`}
-                </td>
-                <td className={Number(row.difference) === 0 ? "amount-neutral" : "amount-alert"}>${Number(row.difference).toFixed(2)}</td>
+              <Fragment key={row.id}>
+                <tr>
+                  <td>{row.orderId}</td>
+                  <td>{row.transactionRef || "-"}</td>
+                  <td><span className={`issue-pill ${row.issueType === "Matched" ? "matched" : "open"}`}>{row.issueType}</span></td>
+                  <td>${Number(row.orderAmount).toFixed(2)}</td>
+                  <td>{row.paymentAmount == null ? "-" : `$${Number(row.paymentAmount).toFixed(2)}`}</td>
+                  <td className={Number(row.difference) === 0 ? "amount-neutral" : "amount-alert"}>${Number(row.difference).toFixed(2)}</td>
+                  <td><span className={`status-pill ${row.status === "Matched" ? "matched" : "open"}`}>{row.status}</span></td>
+                  <td>
+                    <button className="btn btn-outline-primary btn-sm ai-button" onClick={() => explainDiscrepancy(row)}>
+                      ✨ Explain AI
+                    </button>
+                  </td>
+                </tr>
 
-                <td>
-                  <span
-                    className={`status-pill ${row.status === "Matched" ? "matched" : "open"}`}
-                  >
-                    {row.status}
-                  </span>
-                </td>
-
-                <td>
-                  <button
-                    className="btn btn-outline-primary btn-sm ai-button"
-                    onClick={() => explainDiscrepancy(row)}
-                  >
-                    ✨ Explain AI
-                  </button>
-                </td>
-              </tr>
+                {showAI && selectedRow?.id === row.id && (
+                  <tr className="ai-detail-row">
+                    <td colSpan="8">
+                      <div className="ai-panel ai-inline-panel">
+                        <div className="ai-panel-heading">
+                          <div><p className="eyebrow">AI INVESTIGATION</p><h3>Explanation for {row.orderId}</h3></div>
+                          <button className="icon-close" onClick={() => setShowAI(false)} aria-label="Close">×</button>
+                        </div>
+                        {loadingAI ? (
+                          <div className="text-center p-3"><div className="spinner-border text-primary"></div><p className="mt-2">Analysing this discrepancy…</p></div>
+                        ) : aiData && (
+                          <>
+                            <div className="ai-answer"><span>Summary</span><p>{aiData.summary}</p></div>
+                            <div className="ai-answer"><span>Possible cause</span><p>{aiData.possibleCause}</p></div>
+                            <div className="ai-answer"><span>Recommended action</span><p>{aiData.recommendedAction}</p></div>
+                            <p className="confidence">Confidence <strong>{aiData.confidence}</strong></p>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             ))
           ) : (
             <tr>
@@ -166,27 +176,6 @@ function ResultsTable() {
       </table>
     </div>
 
-    {showAI && (
-      <div className="ai-panel">
-        <div className="ai-panel-heading"><div><p className="eyebrow">AI INVESTIGATION</p><h3>Explanation for {selectedRow?.orderId}</h3></div><button className="icon-close" onClick={() => setShowAI(false)} aria-label="Close">×</button></div>
-
-          {loadingAI ? (
-            <div className="text-center p-3">
-              <div className="spinner-border text-primary"></div>
-              <p className="mt-2">Analysing this discrepancy…</p>
-            </div>
-          ) : (
-            aiData && (
-              <>
-                <div className="ai-answer"><span>Summary</span><p>{aiData.summary}</p></div>
-                <div className="ai-answer"><span>Possible cause</span><p>{aiData.possibleCause}</p></div>
-                <div className="ai-answer"><span>Recommended action</span><p>{aiData.recommendedAction}</p></div>
-                <p className="confidence">Confidence <strong>{aiData.confidence}</strong></p>
-              </>
-            )
-          )}
-      </div>
-    )}
   </section>
 );
 }

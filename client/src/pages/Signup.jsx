@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../services/api";
 
 function Signup() {
   const navigate = useNavigate();
@@ -13,14 +13,7 @@ function Signup() {
     e.preventDefault();
 
     try {
-      await axios.post(
-        "https://reconciliation-dashboard.onrender.com/api/auth/signup",
-        {
-          name,
-          email,
-          password,
-        }
-      );
+      await api.post("/auth/signup", { name, email, password });
 
       alert("Signup Successful!");
 
@@ -31,9 +24,12 @@ function Signup() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="card p-4 mx-auto" style={{ maxWidth: "400px" }}>
-        <h2 className="text-center mb-4">Signup</h2>
+    <main className="auth-page">
+      <div className="auth-panel">
+        <div className="brand-mark">R</div>
+        <p className="eyebrow">RECONCILE</p>
+        <h1>Create your workspace</h1>
+        <p className="auth-copy">Get a clear view of every order and payment.</p>
 
         <form onSubmit={handleSignup}>
           <div className="mb-3">
@@ -82,7 +78,7 @@ function Signup() {
           <Link to="/login">Login</Link>
         </p>
       </div>
-    </div>
+    </main>
   );
 }
 

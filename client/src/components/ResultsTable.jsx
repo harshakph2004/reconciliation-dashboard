@@ -10,6 +10,7 @@ function ResultsTable() {
   const [loadingAI, setLoadingAI] = useState(false);
   const [showAI, setShowAI] = useState(false);
   const [aiData, setAiData] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   useEffect(() => {
     fetchResults();
@@ -29,6 +30,8 @@ function ResultsTable() {
     try {
       setLoadingAI(true);
       setShowAI(true);
+      setSelectedRow(row);
+      setAiData(null);
 
       const res = await api.post("/llm/explain", {
         discrepancy: {
@@ -47,9 +50,9 @@ function ResultsTable() {
       console.error(err);
 
       setAiData({
-        summary: "Unable to generate AI explanation.",
-        possibleCause: "AI service failed.",
-        recommendedAction: "Please try again later.",
+        summary: err.response?.data?.message || "Unable to generate an AI explanation.",
+        possibleCause: "The AI service could not process this record.",
+        recommendedAction: "Check the Groq API configuration and try again.",
         confidence: "Unknown",
       });
     } finally {
@@ -73,11 +76,13 @@ function ResultsTable() {
   });
 
   return (
-  <div className="card shadow mt-4 p-4 mb-5">
-    <h3 className="mb-3">Reconciliation Results</h3>
+  <section className="results-card">
+    <div className="section-heading results-heading">
+      <div><p className="eyebrow">EXCEPTION REVIEW</p><h2>Reconciliation results</h2><p>{filteredResults.length} record{filteredResults.length === 1 ? "" : "s"} shown</p></div>
+    </div>
 
-    <div className="row mb-3">
-      <div className="col-md-6">
+    <div className="row g-3 mb-4">
+      <div className="col-md-7">
         <input
           type="text"
           className="form-control"
@@ -87,7 +92,7 @@ function ResultsTable() {
         />
       </div>
 
-      <div className="col-md-3">
+      <div className="col-md-4">
         <select
           className="form-select"
           value={filter}
@@ -103,8 +108,8 @@ function ResultsTable() {
     </div>
 
     <div className="table-responsive">
-      <table className="table table-bordered table-hover">
-        <thead className="table-dark">
+      <table className="table results-table">
+        <thead>
           <tr>
             <th>Order ID</th>
             <th>Transaction Ref</th>
@@ -123,22 +128,18 @@ function ResultsTable() {
               <tr key={row.id}>
                 <td>{row.orderId}</td>
                 <td>{row.transactionRef || "-"}</td>
-                <td>{row.issueType}</td>
-                <td>{Number(row.orderAmount).toFixed(2)}</td>
+                <td><span className={`issue-pill ${row.issueType === "Matched" ? "matched" : "open"}`}>{row.issueType}</span></td>
+                <td>${Number(row.orderAmount).toFixed(2)}</td>
                 <td>
                   {row.paymentAmount == null
                     ? "-"
-                    : Number(row.paymentAmount).toFixed(2)}
+                    : `$${Number(row.paymentAmount).toFixed(2)}`}
                 </td>
-                <td>{Number(row.difference).toFixed(2)}</td>
+                <td className={Number(row.difference) === 0 ? "amount-neutral" : "amount-alert"}>${Number(row.difference).toFixed(2)}</td>
 
                 <td>
                   <span
-                    className={`badge ${
-                      row.status === "Matched"
-                        ? "bg-success"
-                        : "bg-danger"
-                    }`}
+                    className={`status-pill ${row.status === "Matched" ? "matched" : "open"}`}
                   >
                     {row.status}
                   </span>
@@ -146,7 +147,7 @@ function ResultsTable() {
 
                 <td>
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-outline-primary btn-sm ai-button"
                     onClick={() => explainDiscrepancy(row)}
                   >
                     ✨ Explain AI
@@ -156,8 +157,8 @@ function ResultsTable() {
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="text-center">
-                No results found
+              <td colSpan="8" className="text-center empty-state">
+                No records match your current search.
               </td>
             </tr>
           )}
@@ -166,53 +167,27 @@ function ResultsTable() {
     </div>
 
     {showAI && (
-      <div className="card mt-4 border-primary">
-        <div className="card-body">
-          <h4 className="text-primary">AI Explanation</h4>
+      <div className="ai-panel">
+        <div className="ai-panel-heading"><div><p className="eyebrow">AI INVESTIGATION</p><h3>Explanation for {selectedRow?.orderId}</h3></div><button className="icon-close" onClick={() => setShowAI(false)} aria-label="Close">×</button></div>
 
           {loadingAI ? (
             <div className="text-center p-3">
               <div className="spinner-border text-primary"></div>
-              <p className="mt-2">Generating explanation...</p>
+              <p className="mt-2">Analysing this discrepancy…</p>
             </div>
           ) : (
             aiData && (
               <>
-                <p>
-                  <strong>Summary:</strong><br />
-                  {aiData.summary}
-                </p>
-
-                <p>
-                  <strong>Possible Cause:</strong><br />
-                  {aiData.possibleCause}
-                </p>
-
-                <p>
-                  <strong>Recommended Action:</strong><br />
-                  {aiData.recommendedAction}
-                </p>
-
-                <p>
-                  <strong>Confidence:</strong>{" "}
-                  <span className="badge bg-info">
-                    {aiData.confidence}
-                  </span>
-                </p>
-
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => setShowAI(false)}
-                >
-                  Close
-                </button>
+                <div className="ai-answer"><span>Summary</span><p>{aiData.summary}</p></div>
+                <div className="ai-answer"><span>Possible cause</span><p>{aiData.possibleCause}</p></div>
+                <div className="ai-answer"><span>Recommended action</span><p>{aiData.recommendedAction}</p></div>
+                <p className="confidence">Confidence <strong>{aiData.confidence}</strong></p>
               </>
             )
           )}
-        </div>
       </div>
     )}
-  </div>
+  </section>
 );
 }
 export default ResultsTable;

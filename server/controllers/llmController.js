@@ -1,8 +1,6 @@
 import Groq from "groq-sdk";
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+const createGroqClient = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export const explainDiscrepancy = async (req, res) => {
   try {
@@ -11,6 +9,12 @@ export const explainDiscrepancy = async (req, res) => {
     if (!discrepancy) {
       return res.status(400).json({
         message: "Discrepancy data is required",
+      });
+    }
+
+    if (!process.env.GROQ_API_KEY) {
+      return res.status(503).json({
+        message: "AI is not configured. Add GROQ_API_KEY to the server environment and redeploy.",
       });
     }
 
@@ -33,9 +37,10 @@ Discrepancy:
 ${JSON.stringify(discrepancy, null, 2)}
 `;
 
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+    const completion = await createGroqClient().chat.completions.create({
+      model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
       temperature: 0.2,
+      response_format: { type: "json_object" },
       messages: [
         {
           role: "user",
@@ -44,7 +49,11 @@ ${JSON.stringify(discrepancy, null, 2)}
       ],
     });
 
-    const text = completion.choices[0].message.content;
+    const text = completion.choices?.[0]?.message?.content;
+
+    if (!text) {
+      throw new Error("Groq returned an empty response");
+    }
 
     let parsed;
 
@@ -59,10 +68,18 @@ ${JSON.stringify(discrepancy, null, 2)}
 
     res.json(parsed);
   } catch (err) {
-    console.error(err);
+    console.error("Groq explanation error:", err);
 
-    res.status(500).json({
-      message: "AI explanation failed",
+    const status = err.status || err.statusCode;
+    const message =
+      status === 401
+        ? "Groq rejected the API key. Check GROQ_API_KEY in your server environment."
+        : status === 429
+          ? "The AI service is busy. Please try again in a moment."
+          : "AI explanation failed. Please try again later.";
+
+    res.status(status && status >= 400 && status < 600 ? status : 500).json({
+      message,
     });
   }
 };

@@ -39,6 +39,12 @@ cd ../client
 npm install
 ```
 
+### AI configuration
+
+Copy `server/.env.example` to `server/.env` and set `GROQ_API_KEY` to a key from your Groq project. For the deployed Render service, add the same `GROQ_API_KEY` environment variable in the Render dashboard, then redeploy the backend. The application uses `openai/gpt-oss-20b` by default; change `GROQ_MODEL` only if you need another Groq model.
+
+For local frontend development, copy `client/.env.example` to `client/.env` so requests are sent to your local API instead of the deployed server.
+
 ## Architecture
 
 ```

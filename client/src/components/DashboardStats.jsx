@@ -40,23 +40,22 @@ function DashboardStats() {
     }
   };
 
-  const Card = ({ title, value, color }) => (
-    <div className="col-md-3">
-      <div className={`card text-white bg-${color} mb-3 shadow`}>
-        <div className="card-body text-center">
-          <h6>{title}</h6>
-          <h2>{title === "Money At Risk" ? `$${value}` : value}</h2>
-        </div>
+  const Card = ({ title, value, tone, helper }) => (
+    <div className="col-md-6 col-xl-3">
+      <div className={`metric-card ${tone}`}>
+        <p>{title}</p>
+        <strong>{title === "Money At Risk" ? `$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : value}</strong>
+        <small>{helper}</small>
       </div>
     </div>
   );
 
   return (
-    <div className="row mt-4">
-      <Card title="Total Results" value={stats.totalResults} color="dark" />
-      <Card title="Matched" value={stats.matched} color="success" />
-      <Card title="Discrepancies" value={stats.discrepancies} color="danger" />
-      <Card title="Money At Risk" value={stats.moneyAtRisk} color="warning" />
+    <div className="row g-3 metrics-row">
+      <Card title="Records reconciled" value={stats.totalResults} tone="neutral" helper="Total records reviewed" />
+      <Card title="Matched" value={stats.matched} tone="success" helper="Ready to close" />
+      <Card title="Exceptions" value={stats.discrepancies} tone="danger" helper="Needs review" />
+      <Card title="Value reviewed" value={stats.moneyAtRisk} tone="warning" helper="Order value in results" />
     </div>
   );
 }

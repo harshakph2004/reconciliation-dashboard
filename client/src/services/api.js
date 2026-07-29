@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://reconciliation-dashboard.onrender.com/api",
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    "https://reconciliation-dashboard.onrender.com/api",
+  timeout: 20000,
 });
 
 // Automatically attach JWT token to every request

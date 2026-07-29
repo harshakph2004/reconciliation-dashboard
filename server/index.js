@@ -8,6 +8,7 @@ import orderUploadRoutes from "./routes/orderUploadRoutes.js";
 import paymentUploadRoutes from "./routes/paymentUploadRoutes.js";
 import reconcileRoutes from "./routes/reconcileRoutes.js";
 import resultsRoutes from "./routes/resultsRoutes.js";
+import llmRoutes from "./routes/llmRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -22,6 +23,7 @@ app.use("/api/upload/payments", paymentUploadRoutes);
 console.log("Loading reconcile routes...");
 app.use("/api/reconcile", reconcileRoutes);
 app.use("/api/results", resultsRoutes);
+app.use("/api/llm", llmRoutes);
 app.get("/api/test-results", (req, res) => {
   res.json({ message: "Results route reached" });
 });

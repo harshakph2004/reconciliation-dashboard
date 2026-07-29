@@ -7,7 +7,14 @@ Frontend: https://reconciliation-dashboard-two.vercel.app/
 
 Backend: https://reconciliation-dashboard.onrender.com/
 
-For Order CSV and Payment CSV Refer these files :
+## Demo CSV files
+
+Use these sample files to test the dashboard:
+
+- [Download Orders CSV](orders_sample.csv)
+- [Download Payments CSV](payments_sample.csv)
+
+Upload both files, then click **Run Reconciliation**.
 
 
 ## Features

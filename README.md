@@ -11,8 +11,8 @@ Backend: https://reconciliation-dashboard.onrender.com/
 
 Use these sample files to test the dashboard:
 
-- [Download Orders CSV](orders_sample.csv)
-- [Download Payments CSV](payments_sample.csv)
+- [Download Orders CSV](./orders_sample.csv)
+- [Download Payments CSV](./payments_sample.csv)
 
 Upload both files, then click **Run Reconciliation**.
 
